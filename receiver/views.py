@@ -1,9 +1,8 @@
-# receiver/views.py
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
 from .models import RockBlockMessage
 
-@csrf_exempt
+@api_view(["POST"])
 def receive_message(request):
     if request.method == 'POST':
         imei = request.POST.get('imei')
