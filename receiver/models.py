@@ -8,7 +8,7 @@ class RockBlockMessage(models.Model):
     transmit_time = models.DateTimeField()
     iridium_latitude = models.FloatField()
     iridium_longitude = models.FloatField()
-    iridium_cep = models.IntegerField()
+    iridium_cep = models.FloatField()
     data = models.TextField()
 
     def __str__(self):
