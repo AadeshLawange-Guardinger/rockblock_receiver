@@ -1,6 +1,8 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from .models import RockBlockMessage
+from django.core import serializers
+
 
 @api_view(["POST"])
 def receive_message(request):
@@ -29,3 +31,9 @@ def receive_message(request):
 
     # Respond with error for non-POST requests
     return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+def get_messages(request):
+    messages = RockBlockMessage.objects.all()
+    data = serializers.serialize('json', messages)
+    return JsonResponse({'messages': data})
