@@ -5,7 +5,7 @@ from django.db import models
 class RockBlockMessage(models.Model):
     imei = models.CharField(max_length=100)
     momsn = models.IntegerField()
-    transmit_time = models.CharField(max_length=100)
+    transmit_time = models.TextField()
     iridium_latitude = models.FloatField()
     iridium_longitude = models.FloatField()
     iridium_cep = models.FloatField()
