@@ -34,6 +34,5 @@ def receive_message(request):
 
 
 def get_messages(request):
-    messages = RockBlockMessage.objects.all()
-    data = serializers.serialize('json', messages)
-    return JsonResponse({'messages': data})
+    messages = RockBlockMessage.objects.all().values('data')
+    return JsonResponse({'data': list(messages)})
