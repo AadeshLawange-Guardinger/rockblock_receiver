@@ -33,6 +33,14 @@ def receive_message(request):
     # Respond with error for non-POST requests
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
+def unescape_unicode(data):
+    # Replace double backslashes with single backslashes
+    data = data.replace('\\\\', '\\')
+
+    # Unescape Unicode characters
+    data = data.encode().decode('unicode-escape')
+
+    return data
 
 def hex_decoder(hex_string):
     try:
@@ -41,7 +49,9 @@ def hex_decoder(hex_string):
     except ValueError:
         return "Invalid hex string"
 
+@api_view(["GET"])
 def get_messages(request):
-    messages = RockBlockMessage.objects.all().values('data')
-    decoded_data = [hex_decoder(message['data']) for message in messages]
+    messages = RockBlockMessage.objects.all().values_list('data', flat=True)
+    merged_data = ''.join(messages)
+    decoded_data = unescape_unicode(merged_data)
     return JsonResponse({'decoded_data': decoded_data})
