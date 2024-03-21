@@ -53,5 +53,6 @@ def hex_decoder(hex_string):
 def get_messages(request):
     messages = RockBlockMessage.objects.all().values_list('data', flat=True)
     merged_data = ''.join(messages)
-    decoded_data = unescape_unicode(merged_data)
-    return JsonResponse({'decoded_data': decoded_data})
+    decoded_data = hex_decoder(merged_data)
+    unescaped_data = unescape_unicode(decoded_data)
+    return JsonResponse({'decoded_data': unescaped_data})
