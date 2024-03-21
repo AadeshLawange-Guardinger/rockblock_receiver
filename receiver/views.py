@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from receiver.decompression import process_compressed_data
 from .models import RockBlockMessage
 from django.core import serializers
+import numpy as np
 
 
 @api_view(["POST"])
@@ -66,7 +67,8 @@ def get_messages(request):
     # Convert processed data to JSON serializable format
     T_list = T.tolist()
     F_list = F.tolist()
-    Zxx_compressed_resized_list = Zxx_compressed_resized.tolist()
+    Zxx_compressed_resized_abs = np.abs(Zxx_compressed_resized)  # Take absolute values
+    Zxx_compressed_resized_list = Zxx_compressed_resized_abs.tolist()
 
     # Send the processed data in the JSON response
     response_data = {
@@ -75,5 +77,6 @@ def get_messages(request):
         'F': F_list,
         'Zxx_compressed_resized': Zxx_compressed_resized_list
     }
+
 
     return JsonResponse(response_data)
