@@ -1,8 +1,6 @@
 import binascii
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
-
-from receiver.decompression import process_compressed_data
 from .models import RockBlockMessage
 from django.core import serializers
 
@@ -57,22 +55,4 @@ def get_messages(request):
     merged_data = ''.join(messages)
     decoded_data = hex_decoder(merged_data)
     unescaped_data = unescape_unicode(decoded_data)
-
-    # Call the function to process the uncompressed data
-    T, F, Zxx_compressed_resized = process_compressed_data(unescaped_data)
-
-    # Convert processed data to JSON serializable format
-    T_list = T.tolist()
-    F_list = F.tolist()
-    Zxx_compressed_resized_list = Zxx_compressed_resized.tolist()
-
-    # Send the processed data in the JSON response
-    response_data = {
-        'decoded_data': unescaped_data,
-        'T': T_list,
-        'F': F_list,
-        'Zxx_compressed_resized': Zxx_compressed_resized_list
-    }
-
-    return JsonResponse(response_data)
-
+    return JsonResponse({'decoded_data': unescaped_data})
