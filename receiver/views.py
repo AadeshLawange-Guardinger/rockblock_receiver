@@ -1,3 +1,4 @@
+import binascii
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from .models import RockBlockMessage
@@ -33,6 +34,7 @@ def receive_message(request):
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
-def get_messages(request):
+def get_decoded_data(request):
     messages = RockBlockMessage.objects.all().values('data')
-    return JsonResponse({'data': list(messages)})
+    decoded_data = [binascii.unhexlify(message['data']).decode('utf-8') for message in messages]
+    return JsonResponse({'decoded_data': decoded_data})
