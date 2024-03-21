@@ -10,3 +10,6 @@ class RockBlockMessage(models.Model):
     iridium_longitude = models.FloatField()
     iridium_cep = models.IntegerField()
     data = models.TextField()
+
+    def __str__(self):
+        return f"IMEI: {self.imei}, Message Number: {self.momsn}"
