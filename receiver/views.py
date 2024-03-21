@@ -34,7 +34,7 @@ def receive_message(request):
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
-def get_decoded_data(request):
+def get_messages(request):
     messages = RockBlockMessage.objects.all().values('data')
     decoded_data = [binascii.unhexlify(message['data']).decode('utf-8') for message in messages]
     return JsonResponse({'decoded_data': decoded_data})
