@@ -34,7 +34,14 @@ def receive_message(request):
     return JsonResponse({'error': 'Invalid request method'}, status=400)
 
 
+def hex_decoder(hex_string):
+    try:
+        decoded_bytes = bytes.fromhex(hex_string)
+        return decoded_bytes.decode('utf-8')
+    except ValueError:
+        return "Invalid hex string"
+
 def get_messages(request):
     messages = RockBlockMessage.objects.all().values('data')
-    decoded_data = [binascii.unhexlify(message['data']).decode('utf-8') for message in messages]
+    decoded_data = [hex_decoder(message['data']) for message in messages]
     return JsonResponse({'decoded_data': decoded_data})
