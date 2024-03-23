@@ -126,6 +126,9 @@ REST_FRAMEWORK = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 
+# Update your CORS_ALLOWED_ORIGINS setting to remove the path
 CORS_ALLOWED_ORIGINS = [
-    "https://aadeshlawange-guardinger.github.io/ltpauss-frontend/",
+    "https://aadeshlawange-guardinger.github.io",
+    # Add any other origins that you want to allow here
 ]
+
