@@ -1,6 +1,7 @@
 import binascii
 import json
 from django.http import JsonResponse
+from django.shortcuts import render
 from rest_framework.decorators import api_view
 
 from receiver.decompression import process_compressed_data
@@ -93,3 +94,6 @@ def get_messages(request):
     }
 
     return JsonResponse(response_data)
+
+def heatmap_view(request):
+    return render(request, 'heatmap.html')

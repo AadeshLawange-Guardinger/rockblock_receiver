@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plotly Heatmap</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: url("../../static/receiver/dash-bg.svg");
+        background-repeat: no-repeat;
+        background-size: cover;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .plot-container {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .loading {
+        text-align: center;
+        font-style: italic;
+        color: #888;
+      }
+
+      .plot {
+        background: url("../../static/receiver/plot-bg.svg");
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      img {
+        width: 150px;
+        cursor: pointer;
+        box-shadow: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Plotly Heatmap</h1>
+      <div class="plot-container">
+        <img
+          src="../../static/receiver/btn.svg"
+          alt="Show Plot"
+          id="plot-image"
+          class="plot-image"
+        />
+        <div id="plot" class="plot"></div>
+        <p id="loading" class="loading" style="display: none">Loading...</p>
+      </div>
+    </div>
+
+    <script>
+      // JavaScript Code
+      document
+        .getElementById("plot-image")
+        .addEventListener("click", fetchData);
+
+      function fetchData() {
+        document.getElementById("loading").style.display = "block";
+        fetch("http://127.0.0.1:8000/rockblock/messages/")
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            renderPlot(data);
+            document.getElementById("loading").style.display = "none";
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+            document.getElementById("loading").textContent =
+              "Error fetching data";
+          });
+      }
+
+      function renderPlot(data) {
+        var plotDiv = document.getElementById("plot");
+        var plotData = [
+          {
+            x: data.T[0],
+            y: data.F.map((row) => row[0]),
+            z: data.Zxx_compressed_resized,
+            type: "heatmap",
+          },
+        ];
+        var layout = {
+          width: Math.max(800),
+          height: Math.max(600),
+          title: "Reconstructed STFT",
+          scene: {
+            xaxis: { title: "T" },
+            yaxis: { title: "F" },
+            zaxis: { title: "Zxx Compressed Resized" },
+          },
+          font: { color: "white" },
+          plot_bgcolor: "none",
+          paper_bgcolor: "transparent",
+        };
+
+        var config = { displayModeBar: false };
+
+        Plotly.newPlot(plotDiv, plotData, layout, config);
+      }
+    </script>
+  </body>
+</html>
