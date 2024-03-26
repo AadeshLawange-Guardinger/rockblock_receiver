@@ -65,4 +65,11 @@ def process_compressed_data():
 
     Zxx_compressed_resized = Zxx_compressed[:Zxx_shape[0], :Zxx_shape[1]]
     
-    return T, F, Zxx_compressed_resized
+    # Calculate magnitude of Zxx_compressed
+    magnitude_Zxx = np.abs(Zxx_compressed_resized)
+
+    # Convert magnitude to decibels (dB)
+    epsilon = 1e-10
+    Zxx_dB = 20 * np.log10(magnitude_Zxx + epsilon) +208 -26
+
+    return T, F, Zxx_dB

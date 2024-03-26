@@ -63,13 +63,21 @@ def hex_decoder(hex_string):
         return "Invalid hex string"
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def get_messages(request):
-    messages = RockBlockMessage.objects.all().values_list('data', flat=True)
+    request_data = json.loads(request.body)
+    momsn_start = request_data.get('momsnStart')
+    momsn_end = request_data.get('momsnEnd')
+
+    print(momsn_start,momsn_end)
+
+    if momsn_start is not None and momsn_end is not None:
+        messages = RockBlockMessage.objects.filter(momsn__range=(momsn_start, momsn_end)).values_list('data', flat=True)
+    else:
+        messages = None
+
     merged_data = ''.join(messages)
     decoded_data = hex_decoder(merged_data)
-    # unescaped_data = unescape_unicode(decoded_data)
-    # print(decoded_data)
 
     # Write decoded data to JSON file without escaping characters
     with open('compressed_data.json', 'wb') as json_file:
@@ -81,13 +89,11 @@ def get_messages(request):
     # Convert processed data to JSON serializable format
     T_list = T.tolist()
     F_list = F.tolist()
-    Zxx_compressed_resized_abs = np.abs(
-        Zxx_compressed_resized)  # Take absolute values
+    Zxx_compressed_resized_abs = np.abs(Zxx_compressed_resized)  # Take absolute values
     Zxx_compressed_resized_list = Zxx_compressed_resized_abs.tolist()
 
     # Send the processed data in the JSON response
     response_data = {
-        # 'decoded_data': unescaped_data,
         'T': T_list,
         'F': F_list,
         'Zxx_compressed_resized': Zxx_compressed_resized_list
@@ -95,5 +101,26 @@ def get_messages(request):
 
     return JsonResponse(response_data)
 
+
 def heatmap_view(request):
     return render(request, 'heatmap.html')
+
+
+@api_view(["GET"])
+def get_latest_message(request):
+    try:
+        # Retrieve the last row from the table
+        last_message = RockBlockMessage.objects.latest('id')
+        # Assuming 'id' is the primary key field, change it to the appropriate field name if needed
+
+        response_data = {
+            'id': last_message.id,
+            'imei': last_message.imei,
+            'momsn': last_message.momsn,
+            'transmit_time': last_message.transmit_time,
+        }
+
+        return JsonResponse(response_data)
+    except RockBlockMessage.DoesNotExist:
+        # Handle the case where no messages exist in the table
+        return JsonResponse({'error': 'No messages found'}, status=404)
