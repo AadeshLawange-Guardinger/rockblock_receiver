@@ -72,7 +72,7 @@ def get_messages(request):
     print(momsn_start,momsn_end)
 
     if momsn_start is not None and momsn_end is not None:
-        messages = RockBlockMessage.objects.filter(momsn__range=(momsn_start, momsn_end)).values_list('data', flat=True)
+        messages = RockBlockMessage.objects.filter(momsn__range=(momsn_start, momsn_end)).order_by('momsn').values_list('data', flat=True)
     else:
         messages = None
 
