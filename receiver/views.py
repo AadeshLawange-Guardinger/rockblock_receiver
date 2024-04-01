@@ -69,14 +69,11 @@ def get_messages(request):
     momsn_start = request_data.get('momsnStart')
     momsn_end = request_data.get('momsnEnd')
 
-    print(momsn_start,momsn_end)
+    # print(momsn_start,momsn_end)
 
     if momsn_start is not None and momsn_end is not None:
-        messages = RockBlockMessage.objects.filter(momsn__range=(momsn_start, momsn_end)).order_by('momsn').values_list('data', flat=True)
-
-        # Print the data
-        for message in messages:
-            print(message)
+        messages = RockBlockMessage.objects.filter(momsn__range=(
+            momsn_start, momsn_end)).order_by('momsn').values_list('data', flat=True)
     else:
         messages = None
 
@@ -93,7 +90,8 @@ def get_messages(request):
     # Convert processed data to JSON serializable format
     T_list = T.tolist()
     F_list = F.tolist()
-    Zxx_compressed_resized_abs = np.abs(Zxx_compressed_resized)  # Take absolute values
+    Zxx_compressed_resized_abs = np.abs(
+        Zxx_compressed_resized)  # Take absolute values
     Zxx_compressed_resized_list = Zxx_compressed_resized_abs.tolist()
 
     # Send the processed data in the JSON response
@@ -128,10 +126,12 @@ def get_latest_message(request):
     except RockBlockMessage.DoesNotExist:
         # Handle the case where no messages exist in the table
         return JsonResponse({'error': 'No messages found'}, status=404)
-    
+
+
 def fetch_history(request):
     # Retrieve data from the database
-    data = RockBlockMessage.objects.filter(momsn__in=[87, 95, 100, 121]).order_by('momsn', 'transmit_time')
+    data = RockBlockMessage.objects.filter(
+        momsn__in=[87, 95, 100, 121]).order_by('momsn', 'transmit_time')
 
     # Initialize variables
     momsn_start = None

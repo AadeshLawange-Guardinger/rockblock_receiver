@@ -13,18 +13,18 @@ def process_compressed_data():
         compressed_ascii = json.load(file)
 
     # print("Length of compressed data:", len(compressed_ascii))
-    print(compressed_ascii)
+    # print(compressed_ascii)
     # Convert compressed ASCII back to bytes
     compressed_data = compressed_ascii.encode('latin-1')
 
-    print("Compress data", compressed_data)
+    # print("Compress data", compressed_data)
     # Decompress the compressed data
     decompressed_data = zlib.decompress(compressed_data)
 
     # Decode the decompressed bytes back to JSON string
     data_json_decompressed = decompressed_data.decode('utf-8')
 
-    print("Length of decompressed data_json:", len(data_json_decompressed))
+    # print("Length of decompressed data_json:", len(data_json_decompressed))
 
     # Convert JSON string back to Python dictionary
     data_decompressed = json.loads(data_json_decompressed)
