@@ -124,3 +124,43 @@ def get_latest_message(request):
     except RockBlockMessage.DoesNotExist:
         # Handle the case where no messages exist in the table
         return JsonResponse({'error': 'No messages found'}, status=404)
+    
+def fetch_history(request):
+    # Retrieve data from the database
+    data = RockBlockMessage.objects.filter(momsn__in=[87, 95, 100, 121]).order_by('momsn', 'transmit_time')
+
+    # Initialize variables
+    momsn_start = None
+    momsn_end = None
+    transmit_start = None
+    transmit_end = None
+    result = []
+
+    # Iterate through the data
+    for item in data:
+        # Set MOMSN start and transmit start for the current range
+        if item.momsn == 87 or item.momsn == 100:
+            momsn_start = item.momsn
+            transmit_start = item.transmit_time
+        # Set MOMSN end and transmit end for the current range
+        elif item.momsn == 95 or item.momsn == 121:
+            momsn_end = item.momsn
+            transmit_end = item.transmit_time
+            # Append the range to the result list
+            result.append({
+                'momsn_start': momsn_start,
+                'momsn_end': momsn_end,
+                'transmit_start': transmit_start,
+                'transmit_end': transmit_end
+            })
+            # Reset variables for the next range
+            momsn_start = None
+            momsn_end = None
+            transmit_start = None
+            transmit_end = None
+
+    # Serialize the result
+    response_data = {'history': result}
+
+    # Return the serialized data as JSON response
+    return JsonResponse(response_data)
