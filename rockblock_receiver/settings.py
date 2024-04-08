@@ -69,9 +69,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ltpauss_db',
-        'USER': 'ltpuassDB',
-        'PASSWORD': 'LtpuassGuard',
-        'HOST': 'ltpuassserver.ct8ywuymo9c6.ap-south-1.rds.amazonaws.com',
+        'USER': 'poc',
+        'PASSWORD': '123',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }
