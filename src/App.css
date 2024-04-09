@@ -1,0 +1,112 @@
+/* App.css */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url('dash-bg.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.plot-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.loading {
+  text-align: center;
+  font-style: italic;
+  color: #888;
+}
+
+.plot {
+  background: url('plot-bg.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+img {
+  width: 150px;
+  cursor: pointer;
+  box-shadow: #fff;
+}
+
+.message-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.message-popup .close-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+}
+
+.message-popup .close-icon::before {
+  content: "\00d7";
+  /* Unicode for cross symbol */
+  font-size: 20px;
+  color: #999;
+}
+
+.message-popup .close-icon:hover::before {
+  color: #666;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10%;
+}
+
+.input-container input {
+  margin: 10px;
+  padding: 30px 50px;
+  background: url(input-bg.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: none;
+  color: #fff;
+}
+
+.input-container input::placeholder {
+  color: #fff;
+  /* Placeholder color */
+}
