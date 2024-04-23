@@ -1,3 +1,4 @@
+from django.db.models import Min, Max, Count
 import binascii
 import json
 from django.http import JsonResponse
@@ -65,7 +66,7 @@ def receive_message_2(request):
             iridium_longitude=iridium_longitude,
             iridium_cep=iridium_cep,
             header=header[:18],
-            doa = header[19:21],
+            doa=header[19:21],
             data=remaining_data
         )
 
@@ -127,7 +128,7 @@ def get_messages(request):
 
         # Retrieve the report information for momsn_end
         end_report_info = RockBlockMessage2.objects.filter(momsn=momsn_end).values(
-            'iridium_latitude', 'iridium_longitude', 'transmit_time').first()
+            'iridium_latitude', 'iridium_longitude', 'transmit_time', 'doa').first()
 
         # Parse transmit_time to extract date and time
         transmit_time = end_report_info.get('transmit_time')
@@ -183,7 +184,7 @@ def get_messages(request):
     map_data = {
         'lat': end_report_info.get('iridium_latitude'),
         'long': end_report_info.get('iridium_longitude'),
-        'doa': 45
+        'doa': str(end_report_info.get('doa')) + '°' if end_report_info.get('doa') is not None else '--N/A--',
     }
 
     # Combine data into the final response
@@ -191,7 +192,7 @@ def get_messages(request):
         'stft_data': stft_data,
         'waveform_data': waveform_data,
         'psd_data': psd_data,
-        'doa': 23.5,
+        'doa': str(end_report_info.get('doa')) + '°' if end_report_info.get('doa') is not None else '--N/A--',
         'report_info': end_report,
         'bouy_id': f"AS-D 6891",
         'packet_id': f"{momsn_start} - {momsn_end}",
@@ -306,8 +307,6 @@ def login_view(request):
 #     # Return the response as JSON
 #     return JsonResponse(response_data)
 
-from django.db.models import Min, Max, Count
-from django.http import JsonResponse
 
 def fetch_history_2(request):
     # Retrieve the data and group by header
@@ -333,8 +332,10 @@ def fetch_history_2(request):
         transmit_end = item['transmit_end']
 
         # Retrieve the actual data column at momsn_end
-        momsn_end_data = RockBlockMessage2.objects.filter(momsn=momsn_end).values_list('data', flat=True).first()
-        momsn_start_data = RockBlockMessage2.objects.filter(momsn=momsn_start).values_list('data', flat=True).first()
+        momsn_end_data = RockBlockMessage2.objects.filter(
+            momsn=momsn_end).values_list('data', flat=True).first()
+        momsn_start_data = RockBlockMessage2.objects.filter(
+            momsn=momsn_start).values_list('data', flat=True).first()
 
         # Check if momsn_end data ends with a double quote
         if momsn_end_data and momsn_end_data.endswith('"') and momsn_start_data and momsn_start_data.startswith('"'):
@@ -355,7 +356,6 @@ def fetch_history_2(request):
 
     # Return the response as JSON
     return JsonResponse(response_data)
-
 
 
 def buoy_list_api(request):
