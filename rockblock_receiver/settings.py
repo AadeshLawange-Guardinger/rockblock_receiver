@@ -131,4 +131,3 @@ CORS_ALLOWED_ORIGINS = [
     "https://aadeshlawange-guardinger.github.io",
     # Add any other origins that you want to allow here
 ]
-

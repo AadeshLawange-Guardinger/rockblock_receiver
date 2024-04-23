@@ -12,7 +12,7 @@ def process_compressed_data():
     with open(compressed_file_path, 'r') as file:
         compressed_ascii = json.load(file)
 
-    # print("Length of compressed data:", len(compressed_ascii))
+    print("Length of compressed data:", len(compressed_ascii))
     # print(compressed_ascii)
     # Convert compressed ASCII back to bytes
     compressed_data = compressed_ascii.encode('latin-1')
@@ -61,7 +61,7 @@ def process_compressed_data():
 
     ff, tt, temp_fft = signal.stft(temp_data, fs=3200, nperseg=512)
     # Get time and frequency grids
-    T, F = np.meshgrid(tt, ff)
+    T_stft, F_stft = np.meshgrid(tt, ff)
 
     Zxx_compressed_resized = Zxx_compressed[:Zxx_shape[0], :Zxx_shape[1]]
     
@@ -70,6 +70,12 @@ def process_compressed_data():
 
     # Convert magnitude to decibels (dB)
     epsilon = 1e-10
-    Zxx_dB = 20 * np.log10(magnitude_Zxx + epsilon) +208 -26
+    Zxx_dB_stft = 20 * np.log10(magnitude_Zxx + epsilon) +208 -26
 
-    return T, F, Zxx_dB
+    # Waveform plot
+    t_waveform, audio_reconstructed_waveform = signal.istft(Zxx_compressed_resized, fs=3200)
+
+    # PSD plot
+    freqs_psd, psd = signal.welch(audio_reconstructed_waveform, fs=3200)
+
+    return T_stft, F_stft, Zxx_dB_stft, t_waveform, audio_reconstructed_waveform, freqs_psd, psd
