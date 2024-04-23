@@ -151,11 +151,11 @@ def get_messages(request):
     # decoded_data = hex_decoder(merged_data)
 
     # Write decoded data to JSON file without escaping characters
-    with open('compressed_data.json', 'wb') as json_file:
-        json_file.write(merged_data.encode('utf-8'))
+    # with open('compressed_data.json', 'wb') as json_file:
+    #     json_file.write(merged_data.encode('utf-8'))
 
     # Call the function to process the uncompressed data
-    T_stft, F_stft, Zxx_dB_stft, t_waveform, audio_reconstructed_waveform, freqs_psd, psd = process_compressed_data()
+    T_stft, F_stft, Zxx_dB_stft, t_waveform, audio_reconstructed_waveform, freqs_psd, psd = process_compressed_data(merged_data)
 
     # Convert processed data to JSON serializable format
     T_list = T_stft.tolist()

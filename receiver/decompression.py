@@ -5,12 +5,12 @@ import scipy.signal as signal
 import json
 import zlib
 
-def process_compressed_data():
+def process_compressed_data(merged_data):
     # Load the compressed data from the JSON file
-    compressed_file_path = "compressed_data.json"
+    # compressed_file_path = "compressed_data.json"
 
-    with open(compressed_file_path, 'r') as file:
-        compressed_ascii = json.load(file)
+    # with open(compressed_file_path, 'r') as file:
+    compressed_ascii = json.loads(merged_data)
 
     print("Length of compressed data:", len(compressed_ascii))
     # print(compressed_ascii)
