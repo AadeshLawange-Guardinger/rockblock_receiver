@@ -44,6 +44,9 @@ def receive_message_2(request):
         if not header.isdigit():
             # Get the header of the most recent row in the database
             last_entry = RockBlockMessage2.objects.all().order_by('-id').first()
+
+            doa = last_entry.doa
+            
             if last_entry:
                 last_header = last_entry.header
             else:
@@ -56,6 +59,7 @@ def receive_message_2(request):
         else:
             # Split the data into header and remaining data
             remaining_data = '"' + new_data[21:]
+            doa = header[19:21]
 
         # Save the received message
         message = RockBlockMessage2.objects.create(
@@ -66,7 +70,7 @@ def receive_message_2(request):
             iridium_longitude=iridium_longitude,
             iridium_cep=iridium_cep,
             header=header[:18],
-            doa=header[19:21],
+            doa=doa,
             data=remaining_data
         )
 
