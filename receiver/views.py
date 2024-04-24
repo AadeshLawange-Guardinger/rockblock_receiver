@@ -152,6 +152,7 @@ def get_messages(request):
         messages = None
 
     merged_data = ''.join(messages)
+    print(merged_data)
     # decoded_data = hex_decoder(merged_data)
 
     # Write decoded data to JSON file without escaping characters
@@ -369,10 +370,11 @@ def buoy_list_api(request):
     # Generate buoy IDs from 1 to 96
     for i in range(91, 97):
         buoy_id = f"{prefix}{i}"
-        buoy_ids.append(buoy_id)
+        buoy_ids.append({'buoy_id': buoy_id, 'status': 1 if i == 91 else 0})
 
     # Return the response as JSON
-    return JsonResponse({'buoy_id': buoy_ids})
+    return JsonResponse({'buoy_data': buoy_ids})
+
 
 
 ################################################# OLD API'S###############################################
