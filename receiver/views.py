@@ -37,10 +37,10 @@ def receive_message_2(request):
 
         # Skip the first character if it's a quotation mark
         if new_data.startswith('"'):
-            new_data = new_data[1:]
+            split_new_data = new_data[1:]
 
         # Validate if the first 18 characters are numbers
-        header = new_data[:21]
+        header = split_new_data[:21]
         if not header.isdigit():
             # Get the header of the most recent row in the database
             last_entry = RockBlockMessage2.objects.all().order_by('-id').first()
@@ -54,11 +54,11 @@ def receive_message_2(request):
 
             # Use the header from the last entry
             header = last_header
-
+            
             remaining_data = new_data
         else:
             # Split the data into header and remaining data
-            remaining_data = '"' + new_data[21:]
+            remaining_data = '"' + split_new_data[21:]
             doa = header[18:21]
 
         # Save the received message
