@@ -59,7 +59,7 @@ def receive_message_2(request):
         else:
             # Split the data into header and remaining data
             remaining_data = '"' + new_data[21:]
-            doa = header[19:21]
+            doa = header[18:21]
 
         # Save the received message
         message = RockBlockMessage2.objects.create(
