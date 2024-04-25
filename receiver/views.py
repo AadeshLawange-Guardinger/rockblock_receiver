@@ -136,17 +136,20 @@ def get_messages(request):
 
         # Retrieve the report information for momsn_end
         end_report_info = RockBlockMessage2.objects.filter(momsn=momsn_start).values(
-            'iridium_latitude', 'iridium_longitude', 'transmit_time', 'doa').first()
+            'iridium_latitude', 'iridium_longitude', 'transmit_time', 'doa', 'header').first()
 
         # Parse transmit_time to extract date and time
-        transmit_time = end_report_info.get('transmit_time')
-        date, time = transmit_time.split(' ')
+        transmit_time = end_report_info.get('header')
+        date_object = datetime.strptime(transmit_time[:14], "%Y%m%d%H%M%S")
+            # Format the datetime object as per the desired format
+        transmit_start = date_object.strftime("%y-%m-%d %H:%M:%S")
+        date, time = transmit_start.split(' ')
 
         # Update end_report_info with latitude, longitude, date, and time
         end_report = {
             'latitude': end_report_info.get('iridium_latitude'),
             'longitude': end_report_info.get('iridium_longitude'),
-            'date': date,
+            'date': "20"+date,
             'time': time
         }
 
