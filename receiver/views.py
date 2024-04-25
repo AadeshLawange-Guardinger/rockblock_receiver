@@ -38,9 +38,13 @@ def receive_message_2(request):
         # Skip the first character if it's a quotation mark
         if new_data.startswith('"'):
             split_new_data = new_data[1:]
+        else :
+            split_new_data = new_data
 
         # Validate if the first 18 characters are numbers
         header = split_new_data[:21]
+        print("header"+header)
+
         if not header.isdigit():
             # Get the header of the most recent row in the database
             last_entry = RockBlockMessage2.objects.all().order_by('-id').first()
