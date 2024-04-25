@@ -36,3 +36,17 @@ class RockBlockMessage2(models.Model):
 
     def __str__(self):
         return f"IMEI: {self.imei}, Message Number: {self.momsn}"
+    
+class RockBlockMessage3(models.Model):
+    imei = models.CharField(max_length=100)
+    momsn = models.IntegerField()
+    transmit_time = models.TextField()
+    iridium_latitude = models.FloatField()
+    iridium_longitude = models.FloatField()
+    iridium_cep = models.FloatField()
+    data = models.TextField()
+    header = models.TextField()
+    doa = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f"IMEI: {self.imei}, Message Number: {self.momsn}"

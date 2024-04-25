@@ -6,7 +6,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from receiver.decompression import process_compressed_data
 from receiver.timestamp import timestamp_list
-from .models import RockBlockMessage, RockBlockMessage2, UserCredentials
+from .models import RockBlockMessage, RockBlockMessage2, UserCredentials, RockBlockMessage3
 from django.core import serializers
 import numpy as np
 from django.db.models import Count, Max, Min
@@ -17,6 +17,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django.http import JsonResponse
 from django.http import StreamingHttpResponse
+from datetime import datetime
 
 
 ################################################# FETCH DATA FROM SATELLITE ###############################################
@@ -43,21 +44,20 @@ def receive_message_2(request):
 
         # Validate if the first 18 characters are numbers
         header = split_new_data[:21]
-        print("header"+header)
 
         if not header.isdigit():
             # Get the header of the most recent row in the database
-            last_entry = RockBlockMessage2.objects.all().order_by('-id').first()
+            #last_entry = RockBlockMessage3.objects.all().order_by('-id').first()
 
-            doa = last_entry.doa
+            doa = None
             
-            if last_entry:
-                last_header = last_entry.header
-            else:
-                last_header = ""
+            # if last_entry:
+            #     last_header = last_entry.header
+            # else:
+            #     last_header = ""
 
             # Use the header from the last entry
-            header = last_header
+            header = ""
             
             remaining_data = new_data
         else:
@@ -317,7 +317,7 @@ def login_view(request):
 #     return JsonResponse(response_data)
 
 
-def fetch_history_2(request):
+# def fetch_history_2(request):
     # Retrieve the data and group by header
     grouped_data = RockBlockMessage2.objects.values('header').annotate(
         momsn_start=Min('momsn'),
@@ -365,6 +365,62 @@ def fetch_history_2(request):
 
     # Return the response as JSON
     return JsonResponse(response_data)
+
+def fetch_history_2(request):
+    # Fetch MOMSN numbers from the database
+    momsn_list = list(RockBlockMessage2.objects.exclude(header='').order_by('momsn').values_list('momsn', flat=True))
+
+    # Calculate total count of MOMSN
+    momsn_count = RockBlockMessage2.objects.aggregate(
+        total_momsn=Count('momsn'))
+    
+    momsn_ranges = []
+    for i in range(len(momsn_list)):
+        momsn_start = momsn_list[i]  # Set momsn_start to the current MOMSN
+        momsn_end = None
+
+        # Find the next MOMSN number in the list
+        next_momsn = momsn_list[i+1] if i+1 < len(momsn_list) else None
+
+        # Find the latest MOMSN number from the database that is smaller than the next MOMSN number in the list
+        if next_momsn is not None:
+            momsn_end_query = RockBlockMessage2.objects.filter(momsn__lt=next_momsn).order_by('-momsn').first()
+            if momsn_end_query and str(momsn_end_query.data).endswith('"'):
+                momsn_end = momsn_end_query.momsn
+
+
+        # Handle the last MOMSN number in the list
+        if next_momsn is None:
+            latest_momsn_query = RockBlockMessage2.objects.latest('momsn')
+            if latest_momsn_query and momsn_list[i] < latest_momsn_query.momsn:
+                messages_between = RockBlockMessage2.objects.filter(momsn__range=(momsn_start, latest_momsn_query.momsn)).order_by('momsn').values_list('momsn', flat=True)
+                print((messages_between))
+                if len(messages_between) == len((messages_between[0:((latest_momsn_query.momsn) - (momsn_start - 1))])) and str(latest_momsn_query.data).endswith('"'):
+                    momsn_end = latest_momsn_query.momsn
+
+        if momsn_end:
+            # Fetch corresponding transmit start and end times
+            transmit_start_raw = RockBlockMessage2.objects.filter(momsn=momsn_start).order_by('transmit_time').first().header
+            date_object = datetime.strptime(transmit_start_raw[:14], "%Y%m%d%H%M%S")
+            # Format the datetime object as per the desired format
+            transmit_start = date_object.strftime("%y-%m-%d %H:%M:%S")
+            transmit_end = RockBlockMessage2.objects.filter(momsn=momsn_end).order_by('-transmit_time').first().transmit_time
+
+            momsn_ranges.append({
+                'momsn_start': momsn_start,
+                'momsn_end': momsn_end,
+                'transmit_start': transmit_start,
+                'transmit_end': transmit_end,
+            })
+
+    response_data = {
+        'history': momsn_ranges,
+        'momsn_count': momsn_count['total_momsn'],
+        'total_msg': len(momsn_list)
+    }
+
+    return JsonResponse(response_data)
+
 
 
 def buoy_list_api(request):
