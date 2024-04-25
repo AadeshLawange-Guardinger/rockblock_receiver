@@ -368,10 +368,10 @@ def login_view(request):
 
 def fetch_history_2(request):
     # Fetch MOMSN numbers from the database
-    momsn_list = list(RockBlockMessage3.objects.exclude(header='').order_by('momsn').values_list('momsn', flat=True))
+    momsn_list = list(RockBlockMessage2.objects.exclude(header='').order_by('momsn').values_list('momsn', flat=True))
 
     # Calculate total count of MOMSN
-    momsn_count = RockBlockMessage3.objects.aggregate(
+    momsn_count = RockBlockMessage2.objects.aggregate(
         total_momsn=Count('momsn'))
     
     momsn_ranges = []
@@ -384,27 +384,27 @@ def fetch_history_2(request):
 
         # Find the latest MOMSN number from the database that is smaller than the next MOMSN number in the list
         if next_momsn is not None:
-            momsn_end_query = RockBlockMessage3.objects.filter(momsn__lt=next_momsn).order_by('-momsn').first()
+            momsn_end_query = RockBlockMessage2.objects.filter(momsn__lt=next_momsn).order_by('-momsn').first()
             if momsn_end_query and str(momsn_end_query.data).endswith('"'):
                 momsn_end = momsn_end_query.momsn
 
 
         # Handle the last MOMSN number in the list
         if next_momsn is None:
-            latest_momsn_query = RockBlockMessage3.objects.latest('momsn')
+            latest_momsn_query = RockBlockMessage2.objects.latest('momsn')
             if latest_momsn_query and momsn_list[i] < latest_momsn_query.momsn:
-                messages_between = RockBlockMessage3.objects.filter(momsn__range=(momsn_start, latest_momsn_query.momsn)).order_by('momsn').values_list('momsn', flat=True)
+                messages_between = RockBlockMessage2.objects.filter(momsn__range=(momsn_start, latest_momsn_query.momsn)).order_by('momsn').values_list('momsn', flat=True)
                 print((messages_between))
                 if len(messages_between) == len((messages_between[0:((latest_momsn_query.momsn) - (momsn_start - 1))])) and str(latest_momsn_query.data).endswith('"'):
                     momsn_end = latest_momsn_query.momsn
 
         if momsn_end:
             # Fetch corresponding transmit start and end times
-            transmit_start_raw = RockBlockMessage3.objects.filter(momsn=momsn_start).first().header
+            transmit_start_raw = RockBlockMessage2.objects.filter(momsn=momsn_start).first().header
             date_object = datetime.strptime(transmit_start_raw[:14], "%Y%m%d%H%M%S")
             # Format the datetime object as per the desired format
             transmit_start = date_object.strftime("%y-%m-%d %H:%M:%S")
-            transmit_end = RockBlockMessage3.objects.filter(momsn=momsn_end).first().transmit_time
+            transmit_end = RockBlockMessage2.objects.filter(momsn=momsn_end).first().transmit_time
 
             momsn_ranges.append({
                 'momsn_start': momsn_start,
@@ -415,7 +415,7 @@ def fetch_history_2(request):
 
     # Reverse the order of momsn_ranges
     momsn_ranges = list(reversed(momsn_ranges))
-    
+
     response_data = {
         'history': momsn_ranges,
         'momsn_count': momsn_count['total_momsn'],
