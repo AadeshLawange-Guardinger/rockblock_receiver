@@ -135,7 +135,7 @@ def get_messages(request):
     if momsn_start is not None and momsn_end is not None:
 
         # Retrieve the report information for momsn_end
-        end_report_info = RockBlockMessage2.objects.filter(momsn=momsn_end).values(
+        end_report_info = RockBlockMessage2.objects.filter(momsn=momsn_start).values(
             'iridium_latitude', 'iridium_longitude', 'transmit_time', 'doa').first()
 
         # Parse transmit_time to extract date and time
