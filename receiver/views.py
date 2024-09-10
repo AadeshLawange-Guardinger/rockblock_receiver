@@ -139,7 +139,7 @@ def get_messages(request):
 
         # Retrieve the report information for momsn_end
         end_report_info = RockBlockMessage2.objects.filter(momsn=momsn_start).values(
-            'iridium_latitude', 'iridium_longitude', 'transmit_time', 'doa', 'header').first()
+            'iridium_latitude', 'iridium_longitude', 'transmit_time', 'doa', 'header', 'depth').first()
 
         # Parse transmit_time to extract date and time
         transmit_time = end_report_info.get('header')
@@ -208,7 +208,7 @@ def get_messages(request):
         'waveform_data': waveform_data,
         'psd_data': psd_data,
         'doa': str(end_report_info.get('doa')) + '°' if end_report_info.get('doa') is not None else '--N/A--',
-        'depth': str(end_report_info.get('depth')) + '°' if end_report_info.get('depth') is not None else '--N/A--',
+        'depth': str(end_report_info.get('depth')) + 'm' if end_report_info.get('depth') is not None else '--N/A--',
         'report_info': end_report,
         'bouy_id': f"AS-D 6891",
         'packet_id': f"{momsn_start} - {momsn_end}",
