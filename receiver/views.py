@@ -6,7 +6,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from receiver.decompression import process_compressed_data
 from receiver.timestamp import timestamp_list
-from .models import RockBlockMessage, RockBlockMessage2, UserCredentials, RockBlockMessage3
+from .models import RockBlockMessage, RockBlockMessage2, UserCredentials, RockBlockMessageDepth
 from django.core import serializers
 import numpy as np
 from django.db.models import Count, Max, Min
@@ -43,13 +43,14 @@ def receive_message_2(request):
             split_new_data = new_data
 
         # Validate if the first 18 characters are numbers
-        header = split_new_data[:21]
+        header = split_new_data[:24]
 
         if not header.isdigit():
             # Get the header of the most recent row in the database
             #last_entry = RockBlockMessage3.objects.all().order_by('-id').first()
 
             doa = None
+            depth = None
             
             # if last_entry:
             #     last_header = last_entry.header
@@ -62,8 +63,9 @@ def receive_message_2(request):
             remaining_data = new_data
         else:
             # Split the data into header and remaining data
-            remaining_data = '"' + split_new_data[21:]
+            remaining_data = '"' + split_new_data[24:]
             doa = header[18:21]
+            depth = header[21:24]
 
         # Save the received message
         message = RockBlockMessage2.objects.create(
@@ -75,6 +77,7 @@ def receive_message_2(request):
             iridium_cep=iridium_cep,
             header=header[:18],
             doa=doa,
+            depth = depth,
             data=remaining_data
         )
 
@@ -205,6 +208,7 @@ def get_messages(request):
         'waveform_data': waveform_data,
         'psd_data': psd_data,
         'doa': str(end_report_info.get('doa')) + '°' if end_report_info.get('doa') is not None else '--N/A--',
+        'depth': str(end_report_info.get('depth')) + '°' if end_report_info.get('depth') is not None else '--N/A--',
         'report_info': end_report,
         'bouy_id': f"AS-D 6891",
         'packet_id': f"{momsn_start} - {momsn_end}",
